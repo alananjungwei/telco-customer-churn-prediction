@@ -28,7 +28,7 @@ This project aims to:
 | Spending Intensity | Customers with high spending intensity relative to tenure (`MonthlyChargePerTenure`) were much more likely to churn early. | Prioritize retention targeting for high-spending early-stage customers before churn occurs. |
 
 <p align="center">
-  <img src="images/business_finding.png" width="75%">
+  <img src="images/business_finding.png" width="100%">
 </p>
 
 
@@ -225,8 +225,8 @@ Total number of subscribed telecom services per customer.
 - StreamingMovies
 
 <p align="center">
-  <img src="images/1_churn_rate_total_services_yes_no.png" width="45%">
-  <img src="images/1_churn_rate_total_services.png" width="45%">
+  <img src="images/1_churn_rate_total_services_yes_no.png" width="50%">
+  <img src="images/1_churn_rate_total_services.png" width="49%">
 </p>
 
 ### `LongTermCustomer`
@@ -239,8 +239,8 @@ LongTermCustomer = 1 if tenure >= median(tenure)
 
 
 <p align="center">
-  <img src="images/2_long_term_customer_churn_rate.png" width="45%">
-  <img src="images/2_long_term_customer_churn.png" width="45%">
+  <img src="images/2_long_term_customer_churn_rate.png" width="50%">
+  <img src="images/2_long_term_customer_churn.png" width="49%">
 </p>
 
 
@@ -250,8 +250,8 @@ Customers with:
 - above-median monthly charges
 
 <p align="center">
-  <img src="images/3_short_term_high_spender_churn_yes_no.png" width="45%">
-  <img src="images/3_short_term_high_spender_churn_rate.png" width="45%">
+  <img src="images/3_short_term_high_spender_churn_yes_no.png" width="50%">
+  <img src="images/3_short_term_high_spender_churn_rate.png" width="49%">
 </p>
 
 
@@ -264,8 +264,8 @@ Customers with:
 - above-median monthly charges
 
 <p align="center">
-  <img src="images/4_loyal_high_value_churn_yes_no.png" width="45%">
-  <img src="images/4_loyal_high_value_churn_rate.png" width="45%">
+  <img src="images/4_loyal_high_value_churn_yes_no.png" width="50%">
+  <img src="images/4_loyal_high_value_churn_rate.png" width="49%">
 </p>
 
 This feature represented stable premium customers.
@@ -279,7 +279,7 @@ df_drop['MonthlyChargePerTenure'] = (
     / (df_drop['tenure'] + 1))
 ```
 <p align="center">
-  <img src="images/5_monthly_charge_per_tenure_churn_boxplot.png" width="65%">
+  <img src="images/5_monthly_charge_per_tenure_churn_boxplot.png" width="85%">
 </p>
 
 ---

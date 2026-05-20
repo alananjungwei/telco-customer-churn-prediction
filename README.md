@@ -1,6 +1,6 @@
 # telco-customer-churn-prediction
 
-End-to-end machine learning project for predicting telecom customer churn using Logistic Regression, Random Forest, AdaBoost, Gradient Boosting, and XGBoost with hyperparameter tuning, feature engineering, and model interpretability analysis.
+End-to-end customer churn analysis and machine learning project combining predictive modeling, feature engineering, customer lifecycle analysis, and business-oriented behavioral insights to understand and reduce telecom customer churn.
 
 ---
 # Business Problem
@@ -14,6 +14,23 @@ This project aims to:
 - Engineer behavioral customer segments
 - Analyze customer lifecycle dynamics
 - Compare multiple classification models and encoding strategies
+
+
+---
+
+# Key Business Finidngs
+
+| Finding | Observation | Business Recommendation |
+|---|---|---|
+| Short-Term High Spenders | Newly acquired high-spending customers exhibited substantially elevated churn rates. | Improve onboarding experience, customer support, and early-stage retention offers for premium new customers. |
+| Long-Term High-Value Customers | Long-term premium customers demonstrated significantly stronger retention stability. | Develop loyalty programs and long-term customer reward incentives. |
+| Service Bundling | Customers subscribed to more telecom services generally showed lower churn tendencies. | Promote bundled service packages to strengthen ecosystem integration and reduce switching behavior. |
+| Spending Intensity | Customers with high spending intensity relative to tenure (`MonthlyChargePerTenure`) were much more likely to churn early. | Prioritize retention targeting for high-spending early-stage customers before churn occurs. |
+
+<p align="center">
+  <img src="images/business_finding.png" width="75%">
+</p>
+
 
 ---
 
@@ -38,8 +55,8 @@ Dataset source: [Kaggle Telco Customer Churn Dataset](https://www.kaggle.com/dat
 - `tenure` represents the number of months a customer has remained with the company.
 - `MonthlyCharges` and `TotalCharges` are continuous numerical variables.
 - `Churn` is the target variable:
-  - `Yes` = customer left the company
-  - `No` = customer stayed with the company
+  - `Yes (1)` = customer left the company
+  - `No (0)` = customer stayed with the company
 
 ---
 
@@ -58,59 +75,110 @@ The project followed the following machine learning workflow:
 6. Hyperparameter optimization
 7. Feature engineering
 8. Feature importance analysis
-9. Behavioral segmentation analysis
+9. Key findings
+10. Conclusion
 
 ---
 
 # Exploratory Data Analysis (EDA)
 
-## Customers with More Services Tend to Churn Less
 
-Customers subscribed to a larger number of telecom services generally exhibited lower churn rates, suggesting stronger ecosystem integration and higher switching costs.
 
-## Long-Term Customers Exhibit Lower Churn Risk
+## Binary encoding and one-hot encoding 
 
-Customers with tenure above the dataset median demonstrated substantially lower churn rates, highlighting the importance of customer lifecycle stability.
+### Binary Encoding
 
-## Spending Intensity Relative to Tenure
+Features containing two categories were binary encoded into `0` and `1`.
 
-A behavioral feature named `MonthlyChargePerTenure` was engineered:
+Examples:
 
-MonthlyChargePerTenure = MonthlyCharges / (tenure + 1)
+| Original Feature | Encoded Representation |
+|---|---|
+| `gender` | Male = 1, Female = 0 |
+| `Partner` | Yes = 1, No = 0 |
+| `Dependents` | Yes = 1, No = 0 |
 
-Customers with high monthly spending relative to their tenure exhibited significantly elevated churn tendencies, suggesting that aggressively monetized early-stage customers may be more churn-prone.
+Binary encoding preserves information while simplifying categorical variables into machine-readable numerical format.
+
 ---
-# Binary encoding and one-hot encoding 
+
+### One-Hot Encoding
+
+Features containing more than two categories were transformed using one-hot encoding.
+
+Example:
+
+| Original Feature | Categories |
+|---|---|
+| `Contract` | Month-to-month, One year, Two year |
+
+became:
+
+| Encoded Columns |
+|---|
+| `Contract_Month-to-month` |
+| `Contract_One year` |
+| `Contract_Two year` |
+
+Each encoded column represents whether a customer belongs to that category (`1`) or not (`0`).
+
 ---
 
-# Feature Engineering
+## Full vs Reduced One-Hot Encoding
 
-Behavioral and lifecycle-oriented features were engineered to better capture customer retention dynamics.
+Two encoding strategies were compared:
 
-## Engineered Features
+### Full Encoding (`drop_first=False`)
 
-### `TotalServices`
-Total number of subscribed telecom services.
+All generated dummy variables were retained.
 
-### `LongTermCustomer`
-Customers with tenure above the dataset median.
+Example:
 
-### `ShortTermHighSpender`
-Customers with:
-- below-median tenure
-- above-median monthly charges
+| Contract_Month-to-month | Contract_One year | Contract_Two year |
+|---|---|---|
+| 1 | 0 | 0 |
 
-This feature captured newly acquired premium-paying customers.
+Advantages:
+- retains complete category information
+- easier interpretability during EDA and visualization
 
-### `LoyalHighValueCustomer`
-Customers with:
-- above-median tenure
-- above-median monthly charges
+Disadvantages:
+- introduces redundant information
+- may create multicollinearity for linear models
 
-This feature represented stable premium customers.
+---
 
-### `MonthlyChargePerTenure`
-Behavioral feature capturing spending intensity relative to customer lifetime.
+### Reduced Encoding (`drop_first=True`)
+
+The first category was removed during one-hot encoding.
+
+Example:
+
+| Contract_One year | Contract_Two year |
+|---|---|
+| 0 | 0 |
+
+In this case:
+- both `0` values implicitly represent `Month-to-month`
+
+Advantages:
+- reduces feature redundancy
+- mitigates multicollinearity
+- preferred for many linear models
+
+Disadvantages:
+- slightly less intuitive during interpretation
+
+---
+
+## Encoding Comparison Results
+
+Both encoding strategies produced highly similar predictive performance across machine learning models.
+
+This suggests that:
+- redundant dummy variables had limited impact on predictive performance
+- tree-based ensemble models were generally robust to encoding redundancy
+- reduced encoding offered a cleaner and more compact feature representation
 
 ---
 
@@ -125,11 +193,97 @@ The following classification models were evaluated:
 - Gradient Boosting
 - XGBoost
 
+---
+
+# Hyperparameter Optimization
+
 Hyperparameter optimization was performed using:
 - GridSearchCV
 - RandomizedSearchCV
 
 ---
+
+# Feature Engineering
+
+Behavioral and lifecycle-oriented features were engineered to better capture customer retention dynamics and customer spending behavior.
+
+These engineered features aimed to move beyond raw demographic and service information by modeling customer lifecycle patterns, spending intensity, and behavioral segmentation.
+
+## Engineered Features
+
+### `TotalServices`
+Total number of subscribed telecom services per customer.
+
+### Included Services
+
+- PhoneService
+- OnlineSecurity
+- OnlineBackup
+- DeviceProtection
+- TechSupport
+- StreamingTV
+- StreamingMovies
+
+<p align="center">
+  <img src="images/1_churn_rate_total_services_yes_no.png" width="45%">
+  <img src="images/1_churn_rate_total_services.png" width="45%">
+</p>
+
+### `LongTermCustomer`
+
+Binary indicator identifying customers with tenure above the dataset median (29 months).
+
+```python
+LongTermCustomer = 1 if tenure >= median(tenure)
+```
+
+
+<p align="center">
+  <img src="images/2_long_term_customer_churn_rate.png" width="45%">
+  <img src="images/2_long_term_customer_churn.png" width="45%">
+</p>
+
+
+### `ShortTermHighSpender`
+Customers with:
+- below-median tenure
+- above-median monthly charges
+
+<p align="center">
+  <img src="images/3_short_term_high_spender_churn_yes_no.png" width="45%">
+  <img src="images/3_short_term_high_spender_churn_rate.png" width="45%">
+</p>
+
+
+This feature captured newly acquired premium-paying customers.
+
+### `LoyalHighValueCustomer`
+
+Customers with:
+- above-median tenure
+- above-median monthly charges
+
+<p align="center">
+  <img src="images/4_loyal_high_value_churn_yes_no.png" width="45%">
+  <img src="images/4_loyal_high_value_churn_rate.png" width="45%">
+</p>
+
+This feature represented stable premium customers.
+
+### `MonthlyChargePerTenure`
+Behavioral feature capturing spending intensity relative to customer lifetime.
+
+```python
+df_drop['MonthlyChargePerTenure'] = (
+    df_drop['MonthlyCharges']
+    / (df_drop['tenure'] + 1))
+```
+<p align="center">
+  <img src="images/5_monthly_charge_per_tenure_churn_boxplot.png" width="65%">
+</p>
+
+---
+
 
 
 
